@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block page_title %}Fee Structures{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Fee Structures</span><a href="{% url 'fees:structure_add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Structure</a></div>
+  <div class="card-body">
+    <table class="table table-hover">
+      <thead><tr><th>Class</th><th>Fee Name</th><th>Amount</th><th>Frequency</th></tr></thead>
+      <tbody>
+      {% for f in structures %}
+        <tr><td>{{ f.school_class }}</td><td>{{ f.name }}</td><td>Rs {{ f.amount }}</td><td>{{ f.get_frequency_display }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="text-center text-muted">No fee structures yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

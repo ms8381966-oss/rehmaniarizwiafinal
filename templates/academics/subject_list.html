@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_title %}Subjects{% endblock %}
+{% block content %}
+{% include "academics/_academics_tabs.html" %}
+
+<div class="container-fluid">
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Subjects</span>{% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}<a href="{% url 'academics:subject_add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Subject</a>{% endif %}</div>
+  <div class="card-body">
+    <table class="table table-hover">
+      <thead><tr><th>Code</th><th>Name</th><th>Class</th><th>Teacher</th><th></th></tr></thead>
+      <tbody>
+      {% for s in subjects %}
+        <tr><td>{{ s.code }}</td><td>{{ s.name }}</td><td>{{ s.school_class }}</td><td>{{ s.teacher|default:"-" }}</td>
+        <td class="text-end">
+          {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}<a href="{% url 'academics:subject_edit' s.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+          <a href="{% url 'academics:subject_delete' s.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>{% endif %}
+        </td></tr>
+      {% empty %}<tr><td colspan="5" class="text-center text-muted">No subjects yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

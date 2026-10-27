@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block page_title %}{% if teacher %}Edit{% else %}Add{% endif %} Teacher{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">{% if teacher %}Edit{% else %}Add{% endif %} Teacher</div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <h6 class="text-muted">Account Info</h6>
+      <div class="row g-3 mb-3">
+        {% for field in uform %}
+        <div class="col-md-4"><label class="form-label">{{ field.label }}</label>{{ field }}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+        {% endfor %}
+      </div>
+      <h6 class="text-muted">Employment Info</h6>
+      <div class="row g-3">
+        {% for field in tform %}
+        <div class="col-md-4"><label class="form-label">{{ field.label }}</label>{{ field }}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+        {% endfor %}
+      </div>
+      <button class="btn btn-gold mt-4" type="submit"><i class="fa-solid fa-save"></i> Save Teacher</button>
+      <a href="{% url 'teachers:list' %}" class="btn btn-outline-secondary mt-4">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

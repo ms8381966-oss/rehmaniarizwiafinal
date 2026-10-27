@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_title %}Academic Years{% endblock %}
+{% block content %}
+{% include "academics/_academics_tabs.html" %}
+
+<div class="container-fluid">
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Academic Years</span><a href="{% url 'academics:year_add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Year</a></div>
+  <div class="card-body">
+    <table class="table table-hover">
+      <thead><tr><th>Name</th><th>Start</th><th>End</th><th>Current</th></tr></thead>
+      <tbody>
+      {% for y in years %}
+        <tr><td>{{ y.name }}</td><td>{{ y.start_date }}</td><td>{{ y.end_date }}</td><td>{% if y.is_current %}<span class="badge bg-success">Yes</span>{% else %}-{% endif %}</td></tr>
+      {% empty %}<tr><td colspan="4" class="text-center text-muted">No academic years yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

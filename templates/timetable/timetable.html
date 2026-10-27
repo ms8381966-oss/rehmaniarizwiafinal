@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_title %}Timetable{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2 align-items-center">
+      <select name="section" class="form-select form-select-sm" onchange="this.form.submit()">
+        {% for s in sections %}<option value="{{ s.pk }}" {% if section and section.pk == s.pk %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </form>
+    {% if can_edit %}<a href="{% url 'timetable:add' %}{% if section %}?section={{ section.pk }}{% endif %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Period</a>{% endif %}
+  </div>
+  <div class="card-body table-responsive">
+    {% if rows %}
+    <table class="table table-bordered text-center align-middle">
+      <thead><tr><th>Time</th>{% for d in day_names %}<th>{{ d }}</th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr><td class="fw-semibold">{{ r.start|time:"H:i" }}–{{ r.end|time:"H:i" }}</td>
+          {% for cell in r.cells %}<td>
+            {% for p in cell %}
+              <div><strong>{{ p.subject.name|default:"—" }}</strong><br><small class="text-muted">{{ p.teacher.user.get_full_name|default:"" }}{% if p.room %} · {{ p.room }}{% endif %}</small>
+              {% if can_edit %}<br><a href="{% url 'timetable:edit' p.pk %}"><i class="fa-solid fa-pen small"></i></a> <a href="{% url 'timetable:delete' p.pk %}" class="text-danger"><i class="fa-solid fa-trash small"></i></a>{% endif %}</div>
+            {% endfor %}
+          </td>{% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="text-muted mb-0">No timetable has been set up for this section yet.</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,360 @@
+{% load static %}
+<!-- Base html tag ko default identifier assign karein -->
+<!DOCTYPE html>
+<html lang="en" id="theme-wrapper" data-bs-theme="light">
+<head>
+  <script>
+    // System ya local state detect kar ke page render hone se pehle theme apply karna
+    (function () {
+      const savedTheme = localStorage.getItem('theme-state') || 'light';
+      document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    })();
+  </script>
+  <style>
+  /* Base html aur body ko viewport height par stretch karne ke liye */
+  html, body {
+      min-height: 100vh !important;
+      height: 100%;
+  }
+
+  /* Jab dark mode active ho to poore right side panel ko absolute stretch dark kar do */
+  [data-bs-theme="dark"] body {
+      background-color: #0f172a !important;
+  }
+
+  /* Right-side panel ke har wrapper container ko auto-stretch background dena */
+  [data-bs-theme="dark"] .main-content,
+  [data-bs-theme="dark"] .content-wrapper,
+  [data-bs-theme="dark"] #main-content,
+  [data-bs-theme="dark"] main,
+  [data-bs-theme="dark"] .container-fluid,
+  [data-bs-theme="dark"] div[class$="-content"] {
+      background-color: #0f172a !important;
+      background: #0f172a !important;
+      min-height: 100vh !important;
+  }
+</style>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dashboard{% endblock %} | Jamia Rahmania Rizvia Sohawa</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+<style>
+/* Sidebar drag behavior */
+#sidebar .brand {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+#sidebar .brand:active {
+  cursor: grabbing;
+}
+#sidebar.sidebar-dragging {
+  opacity: .97;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, .2);
+  transition: none !important;
+  z-index: 2000;
+}
+body.sidebar-dragging {
+  user-select: none;
+}
+@media (max-width: 900px) {
+  #sidebar .brand {
+    cursor: default;
+    touch-action: auto;
+  }
+}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<nav class="sidebar" id="sidebar">
+  <!-- Brand Area updated with inline flex layout -->
+  <div class="brand d-flex justify-content-between align-items-center">
+    <div>
+      <i class="fa-solid fa-mosque"></i> Jamia Rahmania Rizvia
+      <small class="d-block" style="font-size:.7rem;color:#cbd5e1;font-weight:400">Sohawa, Jhelum</small>
+    </div>
+
+    <!-- ⚡ Dynamic Theme Toggle Icon Button (No Text) -->
+    <button id="theme-toggle-btn" class="btn p-1 border-0 text-white opacity-75 hover-opacity-100" title="Switch Theme" style="background: transparent; box-shadow: none;">
+      <i class="fa-solid fa-moon fs-6" id="theme-icon"></i>
+    </button>
+  </div>
+
+  <ul class="nav flex-column py-2">
+    <!-- Aapke baaki saare menu links yahan se shuru honge -->
+
+    {% if request.user.role in "STUDENT,PARENT" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'portal' %}active{% endif %}" href="{% url 'portal:home' %}"><i class="fa-solid fa-gauge-high"></i> My Portal</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'notices' and request.resolver_match.url_name == 'list' %}active{% endif %}" href="{% url 'notices:list' %}"><i class="fa-solid fa-bullhorn"></i> Notices</a></li>
+      <!--<li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'homework' %}active{% endif %}" href="{% url 'homework:list' %}"><i class="fa-solid fa-book-open-reader"></i> Homework</a></li>-->
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'timetable' %}active{% endif %}" href="{% url 'timetable:view' %}"><i class="fa-solid fa-table-cells"></i> Timetable</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'notices:event_list' %}"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
+    {% else %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:index' %}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'students' %}active{% endif %}" href="{% url 'students:list' %}"><i class="fa-solid fa-user-graduate"></i> Students</a></li>
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'teachers' %}active{% endif %}" href="{% url 'teachers:list' %}"><i class="fa-solid fa-chalkboard-user"></i> Teachers</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'class_list' %}active{% endif %}" href="{% url 'academics:class_list' %}"><i class="fa-solid fa-school"></i> Classes</a></li>
+      <!-- <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'section_list' %}active{% endif %}" href="{% url 'academics:section_list' %}"><i class="fa-solid fa-layer-group"></i> Sections</a></li> -->
+      <!-- <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'subject_list' %}active{% endif %}" href="{% url 'academics:subject_list' %}"><i class="fa-solid fa-book"></i> Subjects</a></li> -->
+      {% endif %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'mark' or request.resolver_match.url_name == 'report' %}active{% endif %}" href="{% url 'attendance:mark' %}"><i class="fa-solid fa-clipboard-check"></i> Attendance</a></li>
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN,TEACHER" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'exams' %}active{% endif %}" href="{% url 'exams:list' %}"><i class="fa-solid fa-file-pen"></i> Exams &amp; Results</a></li>
+      <!--<li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'homework' %}active{% endif %}" href="{% url 'homework:list' %}"><i class="fa-solid fa-book-open-reader"></i> Homework</a></li> -->
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'hifz' %}active{% endif %}" href="{% url 'hifz:list' %}"><i class="fa-solid fa-book-quran"></i> Quran Progress</a></li>
+      {% endif %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'timetable' and request.resolver_match.url_name != 'mine' %}active{% endif %}" href="{% url 'timetable:view' %}"><i class="fa-solid fa-table-cells"></i> Timetable</a></li>
+      {% if request.user.role == "TEACHER" %}<li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'mine' %}active{% endif %}" href="{% url 'timetable:mine' %}"><i class="fa-solid fa-clock"></i> My Schedule</a></li>{% endif %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'library' %}active{% endif %}" href="{% url 'library:books' %}"><i class="fa-solid fa-book-bookmark"></i> Library</a></li>
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN,STAFF,LIBRARIAN" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'inventory' %}active{% endif %}" href="{% url 'inventory:list' %}"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a></li>
+      {% endif %}
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'certificates' %}active{% endif %}" href="{% url 'certificates:list' %}"><i class="fa-solid fa-certificate"></i> Certificates</a></li>
+      {% endif %}
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN,ACCOUNTANT" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'payment_list' %}active{% endif %}" href="{% url 'fees:payment_list' %}"><i class="fa-solid fa-money-bill-wave"></i> Fees</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'income_list' %}active{% endif %}" href="{% url 'fees:income_list' %}"><i class="fa-solid fa-hand-holding-dollar"></i> Income &amp; Funding</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'expense_list' %}active{% endif %}" href="{% url 'fees:expense_list' %}"><i class="fa-solid fa-file-invoice-dollar"></i> Expenses</a></li>
+      {% endif %}
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN,ACCOUNTANT" %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}" href="{% url 'reports:index' %}"><i class="fa-solid fa-file-export"></i> Reports &amp; Export</a></li>
+      {% endif %}
+      <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == 'notices' %}active{% endif %}" href="{% url 'notices:list' %}"><i class="fa-solid fa-bullhorn"></i> Notices</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'notices:event_list' %}"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
+      {% if request.user.is_superuser %}<li class="nav-item"><a class="nav-link" href="/admin/"><i class="fa-solid fa-gear"></i> Admin Panel</a></li>{% endif %}
+    {% endif %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile' %}"><i class="fa-solid fa-user"></i> My Profile</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+  </ul>
+</nav>
+
+<div class="main-content">
+  <div class="topbar">
+    <button class="btn btn-sm btn-outline-secondary" id="sidebarToggle" type="button" title="Show / hide menu" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+    <h5 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h5>
+    <div class="text-end">
+      <div class="fw-semibold">{{ request.user.get_full_name|default:request.user.username }}</div>
+      <small class="text-muted">{{ request.user.get_role_display }}</small>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function () {
+  var sidebar = document.getElementById("sidebar");
+  
+  if (sidebar) {
+    // 1. Page load hone par purani scroll position wapas set karo
+    var savedScroll = localStorage.getItem("sidebarScrollTop");
+    if (savedScroll !== null) {
+      sidebar.scrollTop = parseInt(savedScroll, 10);
+    }
+
+    // 2. Jab bhi user sidebar ko scroll kare, position save kar lo
+    sidebar.addEventListener("scroll", function () {
+      localStorage.setItem("sidebarScrollTop", sidebar.scrollTop);
+    });
+  }
+})();
+(function () {
+  var body = document.body, mobile = window.matchMedia("(max-width: 900px)");
+  try { if (!mobile.matches && localStorage.getItem("sidebarCollapsed") === "1") body.classList.add("sidebar-collapsed"); } catch (e) {}
+  document.getElementById("sidebarToggle").addEventListener("click", function () {
+    if (mobile.matches) { body.classList.toggle("sidebar-open"); }
+    else {
+      body.classList.toggle("sidebar-collapsed");
+      try { localStorage.setItem("sidebarCollapsed", body.classList.contains("sidebar-collapsed") ? "1" : "0"); } catch (e) {}
+    }
+  });
+  document.getElementById("sidebarOverlay").addEventListener("click", function () { body.classList.remove("sidebar-open"); });
+  document.querySelectorAll("#sidebar .nav-link").forEach(function (a) { a.addEventListener("click", function () { body.classList.remove("sidebar-open"); }); });
+  // Keep the active link visible when the menu is long
+  var active = document.querySelector("#sidebar .nav-link.active");
+  if (active) active.scrollIntoView({ block: "nearest" });
+
+  // Reliable sidebar dragging: move using document-level pointer events.
+  var sidebar = document.getElementById("sidebar");
+  var handle = sidebar ? sidebar.querySelector(".brand") : null;
+  var dragging = false;
+  var offsetX = 0;
+  var offsetY = 0;
+
+  function restoreSidebarPosition() {
+    if (!sidebar || mobile.matches) return;
+    try {
+      var saved = JSON.parse(localStorage.getItem("sidebarPosition") || "null");
+      if (saved && typeof saved.left === "number" && typeof saved.top === "number") {
+        var maxLeft = Math.max(0, window.innerWidth - sidebar.offsetWidth);
+        var maxTop = Math.max(0, window.innerHeight - 80);
+        sidebar.style.left = Math.min(Math.max(0, saved.left), maxLeft) + "px";
+        sidebar.style.top = Math.min(Math.max(0, saved.top), maxTop) + "px";
+        sidebar.style.right = "auto";
+        sidebar.style.bottom = "auto";
+      }
+    } catch (e) {}
+  }
+
+  if (sidebar && handle) {
+    handle.style.cursor = "grab";
+    handle.style.userSelect = "none";
+    handle.style.touchAction = "none";
+
+    handle.addEventListener("pointerdown", function (event) {
+      if (mobile.matches || body.classList.contains("sidebar-collapsed")) return;
+      if (event.button !== 0) return;
+
+      dragging = true;
+      var rect = sidebar.getBoundingClientRect();
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+
+      sidebar.style.position = "fixed";
+      sidebar.style.left = rect.left + "px";
+      sidebar.style.top = rect.top + "px";
+      sidebar.style.right = "auto";
+      sidebar.style.bottom = "auto";
+      sidebar.style.transform = "none";
+
+      handle.style.cursor = "grabbing";
+      sidebar.classList.add("sidebar-dragging");
+      body.classList.add("sidebar-dragging");
+      event.preventDefault();
+    });
+
+    document.addEventListener("pointermove", function (event) {
+      if (!dragging) return;
+
+      var maxLeft = Math.max(0, window.innerWidth - sidebar.offsetWidth);
+      var maxTop = Math.max(0, window.innerHeight - 80);
+      var left = Math.min(Math.max(0, event.clientX - offsetX), maxLeft);
+      var top = Math.min(Math.max(0, event.clientY - offsetY), maxTop);
+
+      sidebar.style.left = left + "px";
+      sidebar.style.top = top + "px";
+    });
+
+    function stopSidebarDrag() {
+      if (!dragging) return;
+      dragging = false;
+      handle.style.cursor = "grab";
+      sidebar.classList.remove("sidebar-dragging");
+      body.classList.remove("sidebar-dragging");
+
+      try {
+        localStorage.setItem("sidebarPosition", JSON.stringify({
+          left: parseFloat(sidebar.style.left) || 0,
+          top: parseFloat(sidebar.style.top) || 0
+        }));
+      } catch (e) {}
+    }
+
+      document.addEventListener("pointerup", stopSidebarDrag);
+    document.addEventListener("pointercancel", stopSidebarDrag);
+    window.addEventListener("resize", restoreSidebarPosition);
+  }
+})();
+</script>
+{% block extra_js %}{% endblock %}
+
+<!-- 🚀 Sahi Method: Theme Switcher Code SCRIPT TAG ke andar wrap ho kar yahan aayega -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const themeToggleBtn = document.getElementById("theme-toggle-btn");
+  const themeIcon = document.getElementById("theme-icon");
+  const htmlWrapper = document.documentElement;
+
+  // ⚡ The Ultimate Force Engine for Stubborn Top Bars & Invisible Titles
+  function applyGlobalThemeOverrides(theme) {
+    if (theme === "dark") {
+      // 1. Dhoondein har us container aur div block ko jo top bar banata hai
+      const allDivs = document.querySelectorAll('div, nav, header, section');
+      
+      allDivs.forEach(el => {
+        // Sidebar ya cards ko chhor kar, agar koi element bilkul top horizontal strip mein mojud hai
+        if (!el.closest('#sidebar') && !el.closest('.card') && !el.closest('.table') && el.getBoundingClientRect().top < 80) {
+          // Agar us element par safed backgrounds ki classes hain, to unhe bypass karein
+          if (el.classList.contains('bg-white') || el.classList.contains('bg-light') || window.getComputedStyle(el).backgroundColor === 'rgb(255, 255, 255)') {
+            el.style.setProperty('background-color', '#1e293b', 'important');
+            el.style.setProperty('background', '#1e293b', 'important');
+            el.style.setProperty('border-bottom', '1px solid #334155', 'important');
+          }
+          
+          // 2. Dhoondein us white strip ke andar ke saare invisible texts (Dashboard, Teachers, Super Admin labels)
+          const nestedTexts = el.querySelectorAll('h1, h2, h3, h4, h5, h6, span, a, div, small');
+          nestedTexts.forEach(txt => {
+            if (!txt.closest('#sidebar') && !txt.closest('.card')) {
+              txt.style.setProperty('color', '#ffffff', 'important');
+            }
+          });
+        }
+      });
+    } else {
+      // Light mode restore properties when toggled back
+      const allDivs = document.querySelectorAll('div, nav, header, section');
+      allDivs.forEach(el => {
+        if (!el.closest('#sidebar')) {
+          el.style.backgroundColor = '';
+          el.style.background = '';
+          el.style.borderBottom = '';
+          const nestedTexts = el.querySelectorAll('h1, h2, h3, h4, h5, h6, span, a, div, small');
+          nestedTexts.forEach(txt => { if (!txt.closest('#sidebar')) txt.style.color = ''; });
+        }
+      });
+    }
+  }
+
+  function updateThemeUI(theme) {
+    if (theme === "dark") {
+      themeIcon.className = "fa-solid fa-sun fs-6"; 
+      themeToggleBtn.style.color = "#f59e0b";  
+    } else {
+      themeIcon.className = "fa-solid fa-moon fs-6"; 
+      themeToggleBtn.style.color = "#cbd5e1";   
+    }
+    // Execution triggers
+    applyGlobalThemeOverrides(theme);
+  }
+
+  const currentTheme = htmlWrapper.getAttribute("data-bs-theme") || "light";
+  updateThemeUI(currentTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", function () {
+      const activeTheme = htmlWrapper.getAttribute("data-bs-theme");
+      const newTheme = activeTheme === "dark" ? "light" : "dark";
+      
+      htmlWrapper.setAttribute("data-bs-theme", newTheme);
+      localStorage.setItem("theme-state", newTheme);
+      updateThemeUI(newTheme);
+    });
+  }
+
+  // Double validation trigger execution backup for multi-page refresh
+  setTimeout(() => { applyGlobalThemeOverrides(htmlWrapper.getAttribute("data-bs-theme")); }, 50);
+});
+
+</script>
+
+</body>
+</html>

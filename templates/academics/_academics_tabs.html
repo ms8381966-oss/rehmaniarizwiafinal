@@ -1,0 +1,28 @@
+<!-- Shared Academics Sub-Navigation Tabs -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="btn-group w-100 bg-white p-2 rounded shadow-sm gap-2" role="group" style="border: 1px solid #e2e8f0;">
+      
+      <!-- Button 1: Classes -->
+      <a href="/academics/classes/" class="btn flex-fill rounded {% if '/academics/classes/' in request.path %}btn-primary text-white{% else %}btn-outline-secondary border-0 text-dark{% endif %} fw-semibold py-2">
+        <i class="fa-solid fa-school me-2"></i> Classes
+      </a>
+
+      <!-- Button 2: Academic Years -->
+      <a href="/academics/years/" class="btn flex-fill rounded {% if '/academics/years/' in request.path %}btn-primary text-white{% else %}btn-outline-secondary border-0 text-dark{% endif %} fw-semibold py-2">
+        <i class="fa-solid fa-calendar-days me-2"></i> Academic Years
+      </a>
+
+      <!-- Button 3: Sections -->
+      <a href="/academics/sections/" class="btn flex-fill rounded {% if '/academics/sections/' in request.path %}btn-primary text-white{% else %}btn-outline-secondary border-0 text-dark{% endif %} fw-semibold py-2">
+        <i class="fa-solid fa-layer-group me-2"></i> Sections
+      </a>
+
+      <!-- Button 4: Subjects -->
+      <a href="/academics/subjects/" class="btn flex-fill rounded {% if '/academics/subjects/' in request.path %}btn-primary text-white{% else %}btn-outline-secondary border-0 text-dark{% endif %} fw-semibold py-2">
+        <i class="fa-solid fa-book me-2"></i> Subjects
+      </a>
+
+    </div>
+  </div>
+</div>

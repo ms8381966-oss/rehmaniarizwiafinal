@@ -1,0 +1,289 @@
+:root {
+  --navy: #0b1e3d;
+  --navy-dark: #071530;
+  --gold: #d4af37;
+  --gold-light: #f0d878;
+  --bg: #f4f6fa;
+}
+body { background: var(--bg); font-family: 'Segoe UI', Roboto, sans-serif; }
+.sidebar {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-dark) 100%);
+  min-height: 100vh; width: 250px; position: fixed; top: 0; left: 0; z-index: 1030;
+}
+.sidebar .brand { color: var(--gold); font-weight: 700; padding: 1.25rem 1rem; border-bottom: 1px solid rgba(212,175,55,.2); }
+.sidebar .nav-link { color: #cbd5e1; padding: .6rem 1.1rem; border-radius: 6px; margin: 2px 8px; font-size: .92rem; }
+.sidebar .nav-link.active, .sidebar .nav-link:hover { background: rgba(212,175,55,.15); color: var(--gold-light); }
+.sidebar .nav-link i { width: 20px; }
+.main-content { margin-left: 250px; padding: 1.5rem 1.75rem; }
+.topbar { background: #fff; border-bottom: 1px solid #e5e9f0; padding: .75rem 1.5rem; margin: -1.5rem -1.75rem 1.5rem -1.75rem; display: flex; justify-content: space-between; align-items: center; }
+.stat-card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.05); border-left: 4px solid var(--gold); }
+.stat-card .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--navy); }
+.stat-card .stat-label { color: #6b7280; font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; }
+.card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+.card-header { background: #fff; border-bottom: 1px solid #eef0f4; font-weight: 600; color: var(--navy); border-radius: 12px 12px 0 0 !important; }
+.btn-gold { background: var(--gold); border-color: var(--gold); color: var(--navy-dark); font-weight: 600; }
+.btn-gold:hover { background: var(--gold-light); color: var(--navy-dark); }
+.btn-navy { background: var(--navy); border-color: var(--navy); color: #fff; }
+.btn-navy:hover { background: var(--navy-dark); color: var(--gold-light); }
+.table thead { background: var(--navy); color: #fff; }
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%); }
+.login-card { border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+.login-card .brand-side { background: linear-gradient(160deg, var(--navy) 0%, var(--navy-dark) 100%); color: var(--gold-light); padding: 2.5rem; }
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); transition: transform .2s; }
+  .sidebar.show { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+}
+/* Sidebar ki bunyadi styling aur scrolling */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  overflow-y: auto !important; /* Yeh sidebar ke andar scrollbars on karega taake neechay ke options dikhein */
+  z-index: 1050;
+  transition: all 0.3s ease;
+}
+
+/* Main content ki styling taake sidebar ke sath adjust ho */
+.main-content {
+  margin-left: 260px; /* Sidebar ki width ke barabar margin */
+  transition: all 0.3s ease;
+}
+
+/* Jab 3-line button dabane par sidebar collapse ho jaye */
+body.sidebar-collapsed #sidebar {
+  transform: translateX(-100%); /* Sidebar ko screen se baher chupane ke liye */
+}
+
+body.sidebar-collapsed .main-content {
+  margin-left: 0; /* Jab sidebar chup jaye toh content poori screen par aa jaye */
+}
+
+/* Mobile screens ke liye */
+@media (max-width: 900px) {
+  #sidebar {
+    transform: translateX(-100%);
+  }
+  body.sidebar-open #sidebar {
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* ==========================================================================
+   ADVANCED SCHOOL MANAGEMENT SYSTEM - DARK MODE OPTIMIZATIONS
+   ========================================================================== */
+
+[data-bs-theme="dark"] {
+    /* 1. Dashboard Info Widgets Text Contrast Fix */
+    --bs-body-color: #f8fafc !important;
+    --bs-emphasis-color: #ffffff !important;
+}
+
+/* Dashboard Metrics Card Overrides */
+[data-bs-theme="dark"] .card-body,
+[data-bs-theme="dark"] .card h3,
+[data-bs-theme="dark"] .card h5,
+[data-bs-theme="dark"] .card p,
+[data-bs-theme="dark"] .card span:not(.badge) {
+    color: #f1f5f9 !important; /* Forces all cards texts to be bright white */
+}
+
+/* Dashboard Icons inside cards */
+[data-bs-theme="dark"] .card i {
+    color: #94a3b8 !important; /* Muted gray-silver for metrics icons */
+}
+
+/* 2. Academics Layout Shared Top Tabs Fix */
+[data-bs-theme="dark"] .btn-group .btn-outline-secondary {
+    color: #cbd5e1 !important; /* Unselected tabs text visible gray */
+    background-color: transparent !important;
+    border: none !important;
+}
+[data-bs-theme="dark"] .btn-group .btn-outline-secondary:hover {
+    background-color: #334155 !important;
+    color: #38bdf8 !important; /* Sky blue hover link */
+}
+[data-bs-theme="dark"] .btn-group {
+    background-color: #1e293b !important; /* Dark slate background for tab bar */
+    border-color: #334155 !important;
+}
+
+/* 3. Quran Progress Inputs & Generic Filters Control */
+.container-fluid form .form-control,
+.container-fluid form .form-select {
+    max-width: 100% !important;
+}
+@media (min-width: 768px) {
+    /* Quran module full width inputs adjustment */
+    .container-fluid form .col-md-3 select,
+    .container-fluid form .col-md-3 input {
+        width: 100% !important;
+    }
+}
+
+/* 4. Sidebar Brand Alignment Fix */
+#sidebar .brand {
+    padding-right: 35px !important; /* Leaves secure space for toggle icon */
+    line-height: 1.2 !important;
+}
+#theme-toggle-btn {
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    z-index: 10;
+}
+/* ==========================================================================
+   FORCE BRIGHT TEXT FOR DASHBOARD CARDS IN DARK MODE
+   ========================================================================== */
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] [class*="card-"] {
+    color: #ffffff !important;
+}
+
+/* Dashboard ke bade numbers (40, 4, 5, 10, Rs 68500) ko force white karne ke liye */
+[data-bs-theme="dark"] .card div,
+[data-bs-theme="dark"] .card h1,
+[data-bs-theme="dark"] .card h2,
+[data-bs-theme="dark"] .card h3,
+[data-bs-theme="dark"] .card h4,
+[data-bs-theme="dark"] .card h5,
+[data-bs-theme="dark"] .card h6 {
+    color: #ffffff !important;
+}
+
+/* Small Subtitles aur Labels (TOTAL STUDENTS, TOTAL TEACHERS etc.) ko bright gray karne ke liye */
+[data-bs-theme="dark"] .card small,
+[data-bs-theme="dark"] .card p,
+[data-bs-theme="dark"] .card span {
+    color: #cbd5e1 !important; /* Soft bright silver for clear readability */
+}
+
+/* Cards ke andar mojud icons ko set karne ke liye */
+[data-bs-theme="dark"] .card i {
+    color: #94a3b8 !important;
+}
+/* ==========================================================================
+   SYSTEM ACCENT COMPLETE DARK THEME PRODUCTION OVERRIDES
+   ========================================================================== */
+
+/* 1. TOP HORIZONTAL NAVIGATION BAR FORCE STYLING */
+[data-bs-theme="dark"] nav.navbar,
+[data-bs-theme="dark"] .navbar,
+[data-bs-theme="dark"] div[class*="navbar"],
+[data-bs-theme="dark"] header {
+    background-color: #1e293b !important; /* Elegant slate blue dark background */
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+/* 2. FORCE TOP CENTER INVISIBLE TEXTS TO BE BRIGHT WHITE */
+[data-bs-theme="dark"] nav.navbar *,
+[data-bs-theme="dark"] .navbar *,
+[data-bs-theme="dark"] header *,
+[data-bs-theme="dark"] .navbar-brand,
+[data-bs-theme="dark"] .ms-auto span,
+[data-bs-theme="dark"] .d-flex span {
+    color: #ffffff !important; /* Forces all hidden texts to brilliant white */
+}
+
+/* Specific trace for the center layout page title text nodes */
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] h5,
+[data-bs-theme="dark"] h6,
+[data-bs-theme="dark"] .page-title {
+    color: #ffffff !important;
+}
+
+/* 3. LIGHT CONTRAST DROPDOWN & INPUT PLACEHOLDERS FIX */
+[data-bs-theme="dark"] .form-select option {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+/* Admin panel widget background standardizations */
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+[data-bs-theme="dark"] .dropdown-item {
+    color: #f1f5f9 !important;
+}
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background-color: #334155 !important;
+}
+/* ==========================================================================
+   BOOTSTRAP GLOBAL VARIABLES AND TOP UTILITY OVERRIDES FOR DARK MODE
+   ========================================================================== */
+
+[data-bs-theme="dark"] {
+    /* Bootstrap ke internal dynamic variables ko directly tabdeel karein */
+    --bs-bg-opacity: 1;
+    --bs-body-bg: #0f172a !important;
+    --bs-tertiary-bg: #1e293b !important;
+}
+
+/* 1. TOP WHITE BAR (NAVBAR/HEADER) HARD OVERRIDE */
+[data-bs-theme="dark"] .bg-white,
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] nav:not(.sidebar),
+[data-bs-theme="dark"] header,
+[data-bs-theme="dark"] div[class*="header"] {
+    background-color: #1e293b !important; /* Forces top strip to dark slate */
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+/* 2. FORCE TOP INVISIBLE TEXTS AND ADMIN WIDGETS TO BRIGHT WHITE */
+[data-bs-theme="dark"] nav:not(.sidebar) *,
+[data-bs-theme="dark"] header *,
+[data-bs-theme="dark"] div[class*="header"] *,
+[data-bs-theme="dark"] .page-title,
+[data-bs-theme="dark"] .navbar-brand {
+    color: #ffffff !important; /* Direct children force change to clear white */
+}
+
+/* 3. CENTER HEADINGS GENERIC SELECTOR TRACK */
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] h5,
+[data-bs-theme="dark"] h6 {
+    color: #ffffff !important;
+}
+
+/* 4. MAIN LAYOUT CHASSIS FORCING CODE */
+[data-bs-theme="dark"] .main-content,
+[data-bs-theme="dark"] .content-wrapper,
+[data-bs-theme="dark"] main,
+[data-bs-theme="dark"] .container-fluid {
+    background-color: #0f172a !important;
+}
+/* Custom Wildcard Fallback Controls for Sticky Top Wrapper Bars */
+[data-bs-theme="dark"] div.d-flex.justify-content-between.align-items-center {
+    /* Agar top horizontal block elements bootstrap classes par locked hain */
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .bg-white[style*="position: sticky"],
+[data-bs-theme="dark"] .bg-white[class*="header"] {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+/* Forces page header text hierarchy to always remain bright white */
+[data-bs-theme="dark"] .main-content h1,
+[data-bs-theme="dark"] .main-content h2,
+[data-bs-theme="dark"] .main-content h3,
+[data-bs-theme="dark"] .main-content h4,
+[data-bs-theme="dark"] .main-content .page-title {
+    color: #ffffff !important;
+}

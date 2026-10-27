@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block page_title %}Mark Attendance{% endblock %}
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <form class="row g-2" method="get">
+      <div class="col-md-4">
+        <select class="form-select" name="section" required>
+          <option value="">Select Section</option>
+          {% for s in sections %}<option value="{{ s.id }}" {% if selected_section == s.id|stringformat:"s" %}selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3"><input type="date" class="form-control" name="date" value="{{ selected_date }}"></div>
+      <div class="col-md-2"><button class="btn btn-navy w-100" type="submit">Load</button></div>
+    </form>
+  </div>
+</div>
+{% if students %}
+<div class="card">
+  <div class="card-header">Attendance — {{ selected_date }}</div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="section" value="{{ selected_section }}">
+      <input type="hidden" name="date" value="{{ selected_date }}">
+      <table class="table">
+        <thead><tr><th>Adm #</th><th>Name</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for s in students %}
+          <tr>
+            <td>{{ s.admission_number }}</td>
+            <td>{{ s.full_name }}<input type="hidden" name="student_id" value="{{ s.id }}"></td>
+            <td>
+              <select class="form-select form-select-sm" name="status_{{ s.id }}">
+                {% for val, label in status_choices %}
+                <option value="{{ val }}" {% if s.current_status == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <button class="btn btn-gold" type="submit"><i class="fa-solid fa-save"></i> Save Attendance</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

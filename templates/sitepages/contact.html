@@ -1,0 +1,39 @@
+{% extends "sitepages/base_public.html" %}
+{% block title %}Contact | Jamia Rahmania Rizvia Sohawa{% endblock %}
+{% block content %}
+<section class="hero text-center py-4">
+  <div class="container"><h1 class="display-6">Get in Touch</h1></div>
+</section>
+<section class="container py-5">
+  <div class="row g-5">
+    <div class="col-md-5">
+      <h2 class="section-title">Contact Information</h2>
+      <p class="text-muted"><i class="fa-solid fa-location-dot me-2 text-warning"></i>{{ site_settings.address }}</p>
+      <p class="text-muted"><i class="fa-solid fa-phone me-2 text-warning"></i>{{ site_settings.phone }}</p>
+      <p class="text-muted"><i class="fa-solid fa-envelope me-2 text-warning"></i>{{ site_settings.email }}</p>
+      {% if site_settings.whatsapp_number %}<p class="text-muted"><i class="fa-brands fa-whatsapp me-2 text-warning"></i><a href="https://wa.me/{{ site_settings.whatsapp_number }}" target="_blank" rel="noopener">Chat on WhatsApp</a></p>{% endif %}
+      {% if site_settings.facebook_url %}
+      <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener" class="btn btn-navy btn-sm mt-2">
+        <i class="fa-brands fa-facebook me-1"></i> Follow us on Facebook
+      </a>
+      {% endif %}
+    </div>
+    <div class="col-md-7">
+      <div class="card"><div class="card-body">
+        <h5 class="section-title mb-3">Send Us a Message</h5>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6"><input name="name" class="form-control" placeholder="Your Name" required></div>
+            <div class="col-md-6"><input name="phone" class="form-control" placeholder="Phone / WhatsApp"></div>
+            <div class="col-md-6"><input name="email" type="email" class="form-control" placeholder="Your Email (optional)"></div>
+            <div class="col-md-6"><input name="subject" class="form-control" placeholder="Subject"></div>
+            <div class="col-12"><textarea name="message" class="form-control" rows="4" placeholder="Your Message" required></textarea></div>
+          </div>
+          <button class="btn btn-gold mt-3" type="submit"><i class="fa-solid fa-paper-plane me-1"></i> Send Message</button>
+        </form>
+      </div></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

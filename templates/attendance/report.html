@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block page_title %}Attendance Report{% endblock %}
+{% block content %}
+<div class="card mb-3"><div class="card-body">
+  <form class="row g-2" method="get">
+    <div class="col-md-4">
+      <select class="form-select" name="section">
+        <option value="">All Sections</option>
+        {% for s in sections %}<option value="{{ s.id }}" {% if selected_section == s.id|stringformat:"s" %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-navy w-100" type="submit">Filter</button></div>
+  </form>
+</div></div>
+<div class="card">
+  <div class="card-header">Attendance Records</div>
+  <div class="card-body">
+    <table class="table table-hover">
+      <thead><tr><th>Date</th><th>Student</th><th>Status</th><th>Remarks</th></tr></thead>
+      <tbody>
+      {% for r in records %}
+        <tr><td>{{ r.date }}</td><td>{{ r.student.full_name }}</td><td><span class="badge bg-secondary">{{ r.get_status_display }}</span></td><td>{{ r.remarks|default:"-" }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="text-center text-muted">No records found.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

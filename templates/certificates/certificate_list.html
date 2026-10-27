@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_title %}Certificates{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Issued Certificates</span><a href="{% url 'certificates:add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Issue Certificate</a></div>
+  <div class="card-body table-responsive">
+    <table class="table table-hover align-middle">
+      <thead><tr><th>Serial</th><th>Student</th><th>Type</th><th>Issued</th><th></th></tr></thead>
+      <tbody>
+      {% for c in certificates %}
+        <tr><td>{{ c.serial }}</td><td>{{ c.student.full_name }}</td><td>{{ c.get_kind_display }}</td><td>{{ c.issue_date }}</td>
+          <td class="text-end"><a href="{% url 'certificates:print' c.pk %}" target="_blank" class="btn btn-sm btn-navy"><i class="fa-solid fa-print"></i> Print</a>
+            <a href="{% url 'certificates:delete' c.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a></td></tr>
+      {% empty %}<tr><td colspan="5" class="text-center text-muted">No certificates issued yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% include "partials/pagination.html" %}
+  </div>
+</div>
+{% endblock %}

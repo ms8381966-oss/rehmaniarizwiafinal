@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_title %}Fee Payments{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><a href="{% url 'fees:structure_list' %}" class="btn btn-outline-secondary w-100">Fee Structures</a></div>
+  <div class="col-md-3"><a href="{% url 'fees:income_list' %}" class="btn btn-outline-secondary w-100">Income &amp; Funding</a></div>
+  <div class="col-md-3"><a href="{% url 'fees:expense_list' %}" class="btn btn-outline-secondary w-100">Expenses</a></div>
+  <div class="col-md-3"><a href="{% url 'reports:index' %}" class="btn btn-outline-secondary w-100"><i class="fa-solid fa-file-export"></i> Export Reports</a></div>
+</div>
+<div class="card">
+  <div class="card-header d-flex justify-content-between">
+    <span>Fee Payments</span>
+    <a href="{% url 'fees:payment_add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Collect Fee</a>
+  </div>
+  <div class="card-body">
+    <form class="row g-2 mb-3" method="get">
+      <div class="col-md-3">
+        <select class="form-select" name="status">
+          <option value="">All Status</option>
+          {% for val, label in status_choices %}<option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2"><button class="btn btn-navy w-100" type="submit">Filter</button></div>
+    </form>
+    <table class="table table-hover">
+      <thead><tr><th>Receipt</th><th>Student</th><th>Fee</th><th>Due</th><th>Paid</th><th>Balance</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for p in payments %}
+        <tr>
+          <td>{{ p.receipt_number|default:"-" }}</td>
+          <td>{{ p.student.full_name }}</td>
+          <td>{{ p.fee_structure.name }}</td>
+          <td>Rs {{ p.amount_due }}</td>
+          <td>Rs {{ p.amount_paid }}</td>
+          <td>Rs {{ p.balance }}</td>
+          <td><span class="badge bg-secondary">{{ p.get_status_display }}</span></td>
+          <td><a href="{% url 'fees:payment_edit' p.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a></td>
+        </tr>
+      {% empty %}<tr><td colspan="8" class="text-center text-muted">No payments yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% include "partials/pagination.html" %}
+  </div>
+</div>
+{% endblock %}

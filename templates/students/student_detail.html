@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block page_title %}Student Profile{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between">
+    <span>{{ student.full_name }} — {{ student.admission_number }}</span>
+    <div>
+      <a href="{% url 'hifz:student' student.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-book-quran"></i> Quran Progress</a>
+      {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}<a href="{% url 'certificates:add' %}?student={{ student.pk }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-certificate"></i> Issue Certificate</a>{% endif %}
+      <a href="{% url 'students:edit' student.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i> Edit</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-3 text-center">
+        {% if student.photo %}<img src="{{ student.photo.url }}" class="img-fluid rounded mb-2" style="max-height:180px;">{% else %}<i class="fa-solid fa-user-graduate fa-6x text-secondary mb-2"></i>{% endif %}
+      </div>
+      <div class="col-md-9">
+        <table class="table table-sm">
+          <tr><th>Roll Number</th><td>{{ student.roll_number|default:"-" }}</td></tr>
+          <tr><th>Section</th><td>{{ student.section|default:"-" }}</td></tr>
+          <tr><th>Date of Birth</th><td>{{ student.date_of_birth }}</td></tr>
+          <tr><th>Gender</th><td>{{ student.get_gender_display }}</td></tr>
+          <tr><th>Blood Group</th><td>{{ student.blood_group|default:"-" }}</td></tr>
+          <tr><th>Status</th><td><span class="badge bg-secondary">{{ student.get_status_display }}</span></td></tr>
+          <tr><th>Address</th><td>{{ student.address|default:"-" }}</td></tr>
+          <tr><th>Guardian</th><td>{{ student.guardian_name|default:"-" }} ({{ student.guardian_relation|default:"-" }}) — {{ student.guardian_phone|default:"-" }}</td></tr>
+          <tr><th>Emergency Contact</th><td>{{ student.emergency_contact_name|default:"-" }} — {{ student.emergency_contact_phone|default:"-" }}</td></tr>
+          <tr><th>Previous School</th><td>{{ student.previous_school|default:"-" }}</td></tr>
+          <tr><th>Admission Date</th><td>{{ student.admission_date }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

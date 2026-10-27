@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_title %}Issued Books{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between">
+    <span>Book Issues <a href="?status=out" class="small ms-2">Only not returned</a> · <a href="{% url 'library:issues' %}" class="small">All</a></span>
+    <div><a href="{% url 'library:books' %}" class="btn btn-sm btn-outline-secondary">Books</a> <a href="{% url 'library:issue_add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Issue Book</a></div>
+  </div>
+  <div class="card-body table-responsive">
+    <table class="table table-hover align-middle">
+      <thead><tr><th>Book</th><th>Borrower</th><th>Issued</th><th>Due</th><th>Returned</th><th>Fine (Rs 5/day)</th><th></th></tr></thead>
+      <tbody>
+      {% for i in issues %}
+        <tr><td>{{ i.book.title }}</td><td>{{ i.borrower }}</td><td>{{ i.issued_on }}</td>
+          <td class="{% if not i.is_returned and i.overdue_days %}text-danger fw-bold{% endif %}">{{ i.due_date }}</td>
+          <td>{{ i.returned_on|default:"—" }}</td><td>{% if i.fine %}Rs {{ i.fine }}{% else %}—{% endif %}</td>
+          <td>{% if not i.is_returned %}<form method="post" action="{% url 'library:return' i.pk %}">{% csrf_token %}<button class="btn btn-sm btn-navy">Mark returned</button></form>{% endif %}</td></tr>
+      {% empty %}<tr><td colspan="7" class="text-center text-muted">No records.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% include "partials/pagination.html" %}
+  </div>
+</div>
+{% endblock %}

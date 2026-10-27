@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block page_title %}My Children{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">My Children</div>
+  <div class="card-body">
+    {% if not children %}
+      <p class="text-muted">No children are linked to your account yet. Please contact the school office to link your child's record.</p>
+    {% else %}
+    <div class="row g-3">
+      {% for c in children %}
+      <div class="col-md-4">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="stat-value">{{ c.full_name }}</div>
+            <div class="stat-label mb-3">{{ c.section|default:"Unassigned" }} — {{ c.admission_number }}</div>
+            <a href="{% url 'portal:child_detail' c.pk %}" class="btn btn-navy btn-sm w-100">View Attendance &amp; Fees</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "sitepages/base_public.html" %}
+{% block title %}Home | Jamia Rahmania Rizvia Sohawa{% endblock %}
+{% block content %}
+
+<section class="hero text-center">
+  <div class="container">
+    <p class="mb-2 opacity-75" style="font-family:'Noto Nastaliq Urdu',serif; font-size:1.6rem;">جامعہ رحمانیہ رضویہ سوہاوہ</p>
+    <h1 class="display-5">Jamia Rahmania Rizvia Sohawa</h1>
+    <p class="lead opacity-75 mb-4">Quran, dini taleem and character building — serving students of Sohawa, Jhelum since {{ site_settings.established_year }}.</p>
+    <a href="{% url 'sitepages:about' %}" class="btn btn-gold btn-lg me-2">Learn More</a>
+    <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">Portal Login</a>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row text-center g-4">
+    <div class="col-6 col-md-3">
+      <h2 class="section-title mb-0">{{ site_settings.established_year }}</h2>
+      <p class="text-muted">Established</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <h2 class="section-title mb-0">{{ years_of_service }}+</h2>
+      <p class="text-muted">Years of Service</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <h2 class="section-title mb-0">Hifz &amp; Nazra</h2>
+      <p class="text-muted">Quran Programs</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <h2 class="section-title mb-0">Digital</h2>
+      <p class="text-muted">Record Keeping</p>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light py-5">
+  <div class="container">
+    <h2 class="section-title text-center mb-5">What We Offer</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-book-quran"></i>
+          <h5>Quran &amp; Dini Taleem</h5>
+          <p class="text-muted mb-0">Nazra, Hifz and Tajweed alongside Arabic, Fiqh, Hadith and Islamic studies under qualified Qaris and teachers.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-chart-line"></i>
+          <h5>Digital Progress Tracking</h5>
+          <p class="text-muted mb-0">Attendance, exam results, homework, Quran progress (Sabaq, Sabqi, Manzil) and fee status through the student and parent portal.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="fa-solid fa-hand-holding-heart"></i>
+          <h5>Character Building</h5>
+          <p class="text-muted mb-0">Adab, discipline and community events — students grow in knowledge and in character.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row align-items-center g-4">
+    <div class="col-md-6">
+      <h2 class="section-title">One Portal, Every Role</h2>
+      <p class="text-muted">Every member of the Jamia community gets exactly the access they need:</p>
+      <ul class="text-muted">
+        <li><strong>Admins &amp; Principal / Mohtamim</strong> — full oversight of students, staff, academics, attendance, exams and finances.</li>
+        <li><strong>Teachers &amp; Qaris</strong> — mark attendance, enter exam marks, assign homework and record Quran progress for their own classes.</li>
+        <li><strong>Students &amp; Parents</strong> — a secure, read-only view of attendance, results, homework, timetable, fees, notices and events for their own record.</li>
+      </ul>
+      <a href="{% url 'accounts:login' %}" class="btn btn-navy">Go to Login</a>
+    </div>
+    <div class="col-md-6 text-center">
+      <i class="fa-solid fa-mosque" style="font-size: 10rem; color: var(--gold);"></i>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

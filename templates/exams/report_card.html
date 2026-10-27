@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Result Card — {{ student.full_name }} — {{ exam.name }}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+<style>
+  body { background:#eef1f6; }
+  .sheet { background:#fff; max-width:850px; margin:1.5rem auto; padding:2rem 2.5rem; border:6px double #0b1e3d; }
+  .head { text-align:center; border-bottom:2px solid #d4af37; padding-bottom:.75rem; margin-bottom:1rem; }
+  .head h2 { color:#0b1e3d; margin:0; font-weight:700; }
+  .urdu { font-family:'Noto Nastaliq Urdu',serif; color:#0b1e3d; font-size:1.4rem; }
+  th { background:#0b1e3d !important; color:#fff !important; }
+  @media print { body { background:#fff; } .no-print { display:none !important; } .sheet { margin:0; border-width:4px; } }
+</style>
+</head>
+<body>
+<div class="text-center mt-3 no-print">
+  <button class="btn btn-sm btn-dark" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+  <a class="btn btn-sm btn-outline-secondary" href="javascript:history.back()">Back</a>
+</div>
+<div class="sheet">
+  <div class="head">
+    <div class="urdu">جامعہ رحمانیہ رضویہ سوہاوہ</div>
+    <h2>Jamia Rahmania Rizvia Sohawa</h2>
+    <div class="text-muted small">{{ site_settings.address }}</div>
+    <h5 class="mt-2 mb-0">RESULT CARD — {{ exam.name|upper }}</h5>
+  </div>
+  <div class="row mb-3">
+    <div class="col-6"><strong>Name:</strong> {{ student.full_name }}<br><strong>Guardian:</strong> {{ student.guardian_name|default:"-" }}</div>
+    <div class="col-6 text-end"><strong>Admission #:</strong> {{ student.admission_number }}<br><strong>Class:</strong> {{ exam.school_class.name }}{% if student.section %} — {{ student.section.name }}{% endif %}</div>
+  </div>
+  {% if totals %}
+  <table class="table table-bordered text-center align-middle">
+    <thead><tr><th class="text-start">Subject</th><th>Total</th><th>Obtained</th><th>%</th><th>Grade</th><th>Remarks</th></tr></thead>
+    <tbody>
+      {% for r in results %}
+      <tr><td class="text-start">{{ r.subject.name }}</td><td>{{ r.total_marks }}</td><td class="{% if not r.passed %}text-danger fw-bold{% endif %}">{{ r.obtained_marks }}</td><td>{{ r.percentage }}</td><td>{{ r.grade }}</td><td>{{ r.remarks }}</td></tr>
+      {% endfor %}
+      <tr class="fw-bold table-light"><td class="text-start">Grand Total</td><td>{{ totals.total }}</td><td>{{ totals.obtained }}</td><td>{{ totals.percentage }}</td><td>{{ totals.grade }}</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="row text-center my-3">
+    <div class="col-4"><div class="text-muted small">Result</div><div class="fs-5 fw-bold {% if totals.passed %}text-success{% else %}text-danger{% endif %}">{% if totals.passed %}PASS{% else %}FAIL{% endif %}</div></div>
+    <div class="col-4"><div class="text-muted small">Percentage</div><div class="fs-5 fw-bold">{{ totals.percentage }}%</div></div>
+    <div class="col-4"><div class="text-muted small">Position in class</div><div class="fs-5 fw-bold">{{ position|default:"-" }}{% if position %} / {{ class_size }}{% endif %}</div></div>
+  </div>
+  {% if not totals.passed %}<p class="small text-danger">Failed in: {{ totals.failed_subjects|join:", " }}</p>{% endif %}
+  {% else %}
+  <p class="text-center text-muted my-5">No marks have been entered for this student in this exam.</p>
+  {% endif %}
+  <div class="row mt-5 pt-4 text-center small">
+    <div class="col-4"><hr class="mx-4">Class Teacher</div><div class="col-4"><hr class="mx-4">Parent / Guardian</div><div class="col-4"><hr class="mx-4">Principal / Mohtamim</div>
+  </div>
+  <p class="text-muted small text-center mt-3 mb-0">Grading: A+ ≥90, A ≥80, B ≥70, C ≥60, D ≥50, E ≥40, F &lt;40. Pass mark: 40% per subject.</p>
+</div>
+</body>
+</html>

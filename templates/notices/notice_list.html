@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block page_title %}Notices{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Notice Board</span>{% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}<a href="{% url 'notices:add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Notice</a>{% endif %}</div>
+  <div class="card-body">
+    {% for n in notices %}
+    <div class="border-bottom py-2">
+      <div class="d-flex justify-content-between">
+        <strong>{% if n.is_pinned %}<i class="fa-solid fa-thumbtack text-warning"></i>{% endif %} {{ n.title }}</strong>
+        <div>
+          {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}<a href="{% url 'notices:edit' n.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+          <a href="{% url 'notices:delete' n.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>{% endif %}
+        </div>
+      </div>
+      <p class="mb-1">{{ n.content }}</p>
+      <small class="text-muted">{{ n.get_audience_display }} • {{ n.published_on|date:"M d, Y H:i" }}</small>
+    </div>
+    {% empty %}<p class="text-muted">No notices yet.</p>{% endfor %}
+    {% include "partials/pagination.html" %}
+  </div>
+</div>
+{% endblock %}

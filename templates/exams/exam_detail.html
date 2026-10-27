@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_title %}Results — {{ exam.name }}{% endblock %}
+{% block content %}
+<a href="{% url 'exams:list' %}" class="btn btn-sm btn-outline-secondary mb-3"><i class="fa-solid fa-arrow-left"></i> Back to exams</a>
+<div class="card">
+  <div class="card-header">{{ exam }} {% if not exam.is_published %}<span class="badge bg-secondary">Draft — not visible to students/parents</span>{% endif %}</div>
+  <div class="card-body table-responsive">
+    <table class="table table-sm table-bordered align-middle">
+      <thead><tr><th>Pos.</th><th>Student</th>{% for s in subjects %}<th>{{ s.name }}</th>{% endfor %}<th>Total</th><th>%</th><th>Grade</th><th>Result</th><th></th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>{{ r.position }}</td><td>{{ r.student.full_name }}<br><small class="text-muted">{{ r.student.section }}</small></td>
+          {% for c in r.cells %}<td>{% if c %}<span class="{% if not c.passed %}text-danger fw-bold{% endif %}">{{ c.obtained_marks }}/{{ c.total_marks }}</span>{% else %}-{% endif %}</td>{% endfor %}
+          <td>{{ r.totals.obtained }}/{{ r.totals.total }}</td><td>{{ r.totals.percentage }}</td><td>{{ r.totals.grade }}</td>
+          <td>{% if r.totals.passed %}<span class="badge bg-success">Pass</span>{% else %}<span class="badge bg-danger">Fail</span>{% endif %}</td>
+          <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'exams:report_card' exam.pk r.student.pk %}" target="_blank"><i class="fa-solid fa-print"></i></a></td>
+        </tr>
+      {% empty %}<tr><td colspan="20" class="text-center text-muted">No marks entered yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

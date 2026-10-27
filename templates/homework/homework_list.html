@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block page_title %}Homework{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between"><span>Homework &amp; Assignments</span>
+    {% if can_edit %}<a href="{% url 'homework:add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Assign Homework</a>{% endif %}</div>
+  <div class="card-body">
+    {% for h in items %}
+    <div class="border-bottom py-2">
+      <div class="d-flex justify-content-between">
+        <strong>{{ h.title }}</strong>
+        <div>{% if h.attachment %}<a href="{{ h.attachment.url }}" class="btn btn-sm btn-outline-secondary" target="_blank"><i class="fa-solid fa-paperclip"></i></a>{% endif %}
+        {% if can_edit %}<a href="{% url 'homework:edit' h.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+        <a href="{% url 'homework:delete' h.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>{% endif %}</div>
+      </div>
+      {% if h.description %}<p class="mb-1">{{ h.description|linebreaksbr }}</p>{% endif %}
+      <small class="text-muted">{{ h.section }}{% if h.subject %} · {{ h.subject.name }}{% endif %} · Assigned {{ h.assigned_on }} · <strong>Due {{ h.due_date }}</strong></small>
+    </div>
+    {% empty %}<p class="text-muted mb-0">No homework assigned yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

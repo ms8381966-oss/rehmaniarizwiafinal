@@ -1,0 +1,71 @@
+{% extends "sitepages/base_public.html" %}
+{% block title %}About Us | Jamia Rahmania Rizvia Sohawa{% endblock %}
+{% block content %}
+<section class="hero text-center py-4">
+  <div class="container"><h1 class="display-6">About Jamia Rahmania Rizvia Sohawa</h1></div>
+</section>
+<section class="container py-5">
+  <div class="row g-5 align-items-center">
+    <div class="col-md-6">
+      <h2 class="section-title">Our Story</h2>
+      <p class="text-muted">Jamia Rahmania Rizvia Sohawa was founded in {{ site_settings.established_year }} by <strong>{{ site_settings.founder_name }}</strong>. Located in Sohawa, District Jhelum, the Jamia serves the community with Quran and dini education, and now keeps its records digitally so that students, teachers and parents always know where things stand.</p>
+      <h2 class="section-title mt-4">Our Mission</h2>
+      <p class="text-muted mb-0">To teach the Quran and the Islamic sciences with sincerity and discipline, alongside the skills our students need — supported by transparent, digital administration.</p>
+    </div>
+    <div class="col-md-6">
+      <div class="feature-card">
+        <h5 class="section-title">Our Values</h5>
+        <ul class="text-muted mb-0">
+          <li>Quran, Tajweed and dini knowledge for every student</li>
+          <li>Adab, discipline, honesty and respect</li>
+          <li>Transparent communication with parents</li>
+          <li>Continuous improvement through technology</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card h-100"><div class="card-body">
+          <h5 class="section-title mb-3"><i class="fa-solid fa-address-card me-2"></i>Contact Details</h5>
+          <p class="text-muted mb-2"><i class="fa-solid fa-location-dot me-2 text-warning"></i>{{ site_settings.address }}</p>
+          <p class="text-muted mb-2"><i class="fa-solid fa-phone me-2 text-warning"></i>{{ site_settings.phone }}</p>
+          <p class="text-muted mb-2"><i class="fa-solid fa-envelope me-2 text-warning"></i>{{ site_settings.email }}</p>
+          {% if site_settings.whatsapp_number %}
+          <p class="text-muted mb-2"><i class="fa-brands fa-whatsapp me-2 text-warning"></i><a href="https://wa.me/{{ site_settings.whatsapp_number }}" target="_blank" rel="noopener">WhatsApp: {{ site_settings.whatsapp_number }}</a></p>
+          {% endif %}
+          {% if site_settings.facebook_url %}
+          <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener" class="btn btn-navy btn-sm mt-2">
+            <i class="fa-brands fa-facebook me-1"></i> Follow us on Facebook
+          </a>
+          {% endif %}
+          {% if site_settings.website_url %}
+          <a href="{{ site_settings.website_url }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm mt-2"><i class="fa-solid fa-globe me-1"></i> Website</a>
+          {% endif %}
+        </div></div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100"><div class="card-body">
+          <h5 class="section-title mb-3"><i class="fa-solid fa-building-columns me-2"></i>Bank Details for Donations</h5>
+          {% if site_settings.bank_name or site_settings.account_number %}
+          <table class="table table-sm mb-0">
+            {% if site_settings.bank_name %}<tr><th>Bank</th><td>{{ site_settings.bank_name }}</td></tr>{% endif %}
+            {% if site_settings.account_title %}<tr><th>Account Title</th><td>{{ site_settings.account_title }}</td></tr>{% endif %}
+            {% if site_settings.account_number %}<tr><th>Account Number</th><td>{{ site_settings.account_number }}</td></tr>{% endif %}
+            {% if site_settings.iban %}<tr><th>IBAN</th><td>{{ site_settings.iban }}</td></tr>{% endif %}
+            {% if site_settings.branch_code %}<tr><th>Branch Code</th><td>{{ site_settings.branch_code }}</td></tr>{% endif %}
+          </table>
+          <p class="text-muted small mt-3 mb-0">Your Zakat, Sadqa, Sadqa-e-Fitar, Ushar or general donations directly support the education of our students. Jazak Allah Khair for your support.</p>
+          {% else %}
+          <p class="text-muted mb-0">Bank details will be published here soon. Please contact the Jamia office directly to arrange a donation.</p>
+          {% endif %}
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

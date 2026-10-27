@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block page_title %}Teacher Profile{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">{{ teacher.user.get_full_name }} — {{ teacher.employee_id }}</div>
+  <div class="card-body">
+    <table class="table table-sm">
+      <tr><th>Email</th><td>{{ teacher.user.email }}</td></tr>
+      <tr><th>Phone</th><td>{{ teacher.user.phone }}</td></tr>
+      <tr><th>Qualification</th><td>{{ teacher.qualification|default:"-" }}</td></tr>
+      <tr><th>Experience</th><td>{{ teacher.experience_years }} years</td></tr>
+      <tr><th>Date Joined</th><td>{{ teacher.date_joined }}</td></tr>
+      <tr><th>Address</th><td>{{ teacher.address|default:"-" }}</td></tr>
+      <tr><th>Assigned Subjects</th><td>{% for s in teacher.subjects.all %}<span class="badge bg-secondary me-1">{{ s.name }}</span>{% empty %}-{% endfor %}</td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

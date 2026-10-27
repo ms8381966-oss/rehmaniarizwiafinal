@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block page_title %}Library Management{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Dark mode table fixes aur clean alignment */
+  [data-bs-theme="dark"] .table thead,
+  [data-bs-theme="dark"] .table th {
+      background-color: #0b1e3d !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #1e293b !important;
+  }
+  .btn-gold i {
+      color: #ffffff !important;
+  }
+  /* Card border radius consistency */
+  .card {
+      overflow: hidden;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- 🛠️ Top Segment Toggle Switch Buttons Panel -->
+<div class="mb-4 d-flex gap-2 border-bottom pb-2">
+  <a href="{% url 'library:books' %}" class="btn btn-navy shadow-sm px-4">
+    <i class="fa-solid fa-book-open me-2"></i> Books Inventory
+  </a>
+  <a href="{% url 'library:sales_list' %}" class="btn btn-outline-secondary px-4 bg-white">
+    <i class="fa-solid fa-calculator me-2"></i> Book Sales
+  </a>
+</div>
+
+<!-- Extra Filter bar outside to match spacing layout -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <form method="GET" class="d-flex align-items-center flex-wrap gap-2 m-0">
+    <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm d-inline-block w-auto" placeholder="Search title / author / category...">
+    
+    <!-- Dynamic Sale Status Filter Box -->
+    <select name="sale_status" class="form-select form-select-sm d-inline-block w-auto">
+      <option value="">All Sale Status</option>
+      <option value="FOR_SALE" {% if request.GET.sale_status == 'FOR_SALE' %}selected{% endif %}>For Sale</option>
+      <option value="NOT_FOR_SALE" {% if request.GET.sale_status == 'NOT_FOR_SALE' %}selected{% endif %}>Not For Sale</option>
+    </select>
+
+    <!-- Corrected Value Mapping for Normal Book vs Own Publication -->
+    <select name="publication_type" class="form-select form-select-sm d-inline-block w-auto">
+      <option value="">All Publications</option>
+      <option value="OWN" {% if request.GET.publication_type == 'OWN' %}selected{% endif %}>Own Publication</option>
+      <option value="EXTERNAL" {% if request.GET.publication_type == 'EXTERNAL' or request.GET.publication_type == 'NORMAL' %}selected{% endif %}>Normal Book</option>
+    </select>
+
+    <select name="stock_status" class="form-select form-select-sm d-inline-block w-auto" style="font-size: 0.85rem;">
+      <option value="">All Stock</option>
+      <option value="low_stock" {% if request.GET.stock_status == 'low_stock' %}selected{% endif %}>Low Stock</option>
+      <option value="out_of_stock" {% if request.GET.stock_status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+    </select>
+
+    <button type="submit" class="btn btn-sm btn-primary fw-semibold px-3">Filter</button>
+  </form>
+
+  {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN,LIBRARIAN" %}
+    <a href="{% url 'library:book_add' %}" class="btn btn-gold btn-sm fw-semibold px-3 py-1 text-white">
+      <i class="fa-solid fa-plus me-1 text-white"></i> Add Book
+    </a>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th class="ps-3">Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Publication</th>
+          <th>Sale Status</th>
+          <th>Price</th>
+          <th>Copies</th>
+          <th>Shelf</th>
+          {% if can_edit %}<th class="text-end pe-3">Actions</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+      {% for b in books %}
+        <tr>
+          <td class="ps-3">
+            <strong>{{ b.title }}</strong>
+            {% if b.isbn %}<br><small class="text-muted">ISBN: {{ b.isbn }}</small>{% endif %}
+          </td>
+          <td>{{ b.author|default:"-" }}</td>
+          <td>{{ b.category|default:"-" }}</td>
+          <td>
+            <span class="badge {% if b.publication_type == 'OWN' %}bg-primary{% else %}bg-secondary{% endif %}">
+              {{ b.get_publication_type_display }}
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if b.sale_status == 'FOR_SALE' %}bg-success{% else %}bg-info text-dark{% endif %}">
+              {{ b.get_sale_status_display }}
+            </span>
+          </td>
+          <td class="font-monospace fw-bold">Rs {{ b.price }}</td>
+          <td class="fw-bold">{{ b.copies }}</td>
+          <td>{{ b.shelf|default:"-" }}</td>
+          {% if can_edit %}
+          <td class="text-end pe-3">
+            <a href="{% url 'library:book_edit' b.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+            <a href="{% url 'library:book_delete' b.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+          </td>
+          {% endif %}
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No books found inside catalog.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer bg-white border-top">
+    {% include "partials/pagination.html" %}
+  </div>
+</div>
+{% endblock %}

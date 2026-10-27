@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_title %}Exams &amp; Results{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between">
+    <span>Exams</span>
+    {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}<a href="{% url 'exams:add' %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Exam</a>{% endif %}
+  </div>
+  <div class="card-body table-responsive">
+    <table class="table table-hover align-middle">
+      <thead><tr><th>Exam</th><th>Class</th><th>Dates</th><th>Published</th><th></th></tr></thead>
+      <tbody>
+      {% for e in exams %}
+        <tr>
+          <td>{{ e.name }}</td><td>{{ e.school_class.name }}</td>
+          <td>{{ e.start_date }}{% if e.end_date %} → {{ e.end_date }}{% endif %}</td>
+          <td>{% if e.is_published %}<span class="badge bg-success">Published</span>{% else %}<span class="badge bg-secondary">Draft</span>{% endif %}</td>
+          <td class="text-end">
+            <a href="{% url 'exams:marks' e.pk %}" class="btn btn-sm btn-navy"><i class="fa-solid fa-pen-to-square"></i> Enter Marks</a>
+            <a href="{% url 'exams:detail' e.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-table"></i> Results</a>
+            {% if request.user.is_superuser or request.user.role in "SUPER_ADMIN,PRINCIPAL,ADMIN" %}
+            <a href="{% url 'exams:edit' e.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+            <a href="{% url 'exams:delete' e.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-center text-muted">No exams yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% include "partials/pagination.html" %}
+  </div>
+</div>
+{% endblock %}

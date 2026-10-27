@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block page_title %}My Teaching Schedule{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">My Teaching Schedule</div>
+  <div class="card-body table-responsive">
+    {% if rows %}
+    <table class="table table-bordered text-center align-middle">
+      <thead><tr><th>Time</th>{% for d in day_names %}<th>{{ d }}</th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr><td class="fw-semibold">{{ r.start|time:"H:i" }}–{{ r.end|time:"H:i" }}</td>
+          {% for cell in r.cells %}<td>{% for p in cell %}<div><strong>{{ p.subject.name|default:"—" }}</strong><br><small class="text-muted">{{ p.section }}{% if p.room %} · {{ p.room }}{% endif %}</small></div>{% endfor %}</td>{% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="text-muted mb-0">No periods are assigned to you yet.</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+  /* Direct target to override any complex bootstrap container colors */
+  [data-bs-theme="dark"] .card {
+      color: #ffffff !important;
+  }
+  [data-bs-theme="dark"] .card * {
+      color: #ffffff !important;
+  }
+  [data-bs-theme="dark"] .card .text-muted,
+  [data-bs-theme="dark"] .card small,
+  [data-bs-theme="dark"] .card p {
+      color: #cbd5e1 !important; /* Silver text for description titles */
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row g-3 mb-3">
+  {% for label, value, icon in stats %}{% endfor %}
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ total_students }}</div>
+      <div class="stat-label"><i class="fa-solid fa-user-graduate me-1"></i>Total Students</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ total_teachers }}</div>
+      <div class="stat-label"><i class="fa-solid fa-chalkboard-user me-1"></i>Total Teachers</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ total_classes }}</div>
+      <div class="stat-label"><i class="fa-solid fa-school me-1"></i>Total Classes</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ total_sections }}</div>
+      <div class="stat-label"><i class="fa-solid fa-layer-group me-1"></i>Total Sections</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ upcoming_exams }}</div>
+      <div class="stat-label"><i class="fa-solid fa-file-pen me-1"></i>Upcoming Exams</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ low_stock_items }}</div>
+      <div class="stat-label"><i class="fa-solid fa-boxes-stacked me-1"></i>Low-Stock Items</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ today_pct }}%</div>
+      <div class="stat-label"><i class="fa-solid fa-clipboard-check me-1"></i>Today's Attendance</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ month_pct }}%</div>
+      <div class="stat-label"><i class="fa-solid fa-calendar-check me-1"></i>Monthly Attendance</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">Rs {{ fee_collected }}</div>
+      <div class="stat-label"><i class="fa-solid fa-money-bill-wave me-1"></i>Fee Collected (Month)</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">Rs {{ pending_fees }}</div>
+      <div class="stat-label"><i class="fa-solid fa-triangle-exclamation me-1"></i>Pending Fees</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">Rs {{ monthly_income }}</div>
+      <div class="stat-label"><i class="fa-solid fa-hand-holding-dollar me-1"></i>Donations / Funding (Month)</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">Rs {{ monthly_expenses }}</div>
+      <div class="stat-label"><i class="fa-solid fa-file-invoice-dollar me-1"></i>Monthly Expenses</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">Rs {{ profit|floatformat:0 }}</div>
+      <div class="stat-label"><i class="fa-solid fa-chart-line me-1"></i>Profit (Month)</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ total_subjects }}</div>
+      <div class="stat-label"><i class="fa-solid fa-book me-1"></i>Total Subjects</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ total_staff }}</div>
+      <div class="stat-label"><i class="fa-solid fa-people-group me-1"></i>Total Staff</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">Attendance Trend (6 months)</div>
+      <div class="card-body"><canvas id="attendanceChart" height="110"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">Students by Class</div>
+      <div class="card-body"><canvas id="classChart" height="110"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Recent Admissions</div>
+      <ul class="list-group list-group-flush">
+        {% for s in recent_admissions %}
+        <li class="list-group-item d-flex justify-content-between">{{ s.full_name }} <span class="text-muted small">{{ s.admission_number }}</span></li>
+        {% empty %}<li class="list-group-item text-muted">No recent admissions.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Recent Fee Payments</div>
+      <ul class="list-group list-group-flush">
+        {% for p in recent_payments %}
+        <li class="list-group-item d-flex justify-content-between">{{ p.student.full_name }} <span class="text-muted small">Rs {{ p.amount_paid }}</span></li>
+        {% empty %}<li class="list-group-item text-muted">No recent payments.</li>{% endfor %}
+      </ul>
+      <div class="card-header border-top">Recent Donations / Income</div>
+      <ul class="list-group list-group-flush">
+        {% for i in recent_income %}
+        <li class="list-group-item d-flex justify-content-between">{{ i.donor_name }} <span class="text-muted small">{{ i.get_income_type_display }} — Rs {{ i.amount }}</span></li>
+        {% empty %}<li class="list-group-item text-muted">No recent donations.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Recent Notices &amp; Upcoming Events</div>
+      <ul class="list-group list-group-flush">
+        {% for n in recent_notices %}<li class="list-group-item">{{ n.title }}</li>{% endfor %}
+        {% for e in upcoming_events %}<li class="list-group-item text-muted small"><i class="fa-solid fa-calendar-day me-1"></i>{{ e.title }} - {{ e.date }}</li>{% endfor %}
+        {% if not recent_notices and not upcoming_events %}<li class="list-group-item text-muted">Nothing to show.</li>{% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('attendanceChart'), {
+  type: 'line',
+  data: {
+    labels: {{ chart_months|safe }},
+    datasets: [{ label: 'Attendance %', data: {{ chart_attendance|safe }}, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,.15)', tension: .35, fill: true }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: { beginAtZero: true, max: 100 }
+    }
+  }
+});
+
+new Chart(document.getElementById('classChart'), {
+  type: 'pie',
+  data: {
+    labels: {{ chart_class_labels|safe }},
+    datasets: [{ data: {{ chart_class_data|safe }}, backgroundColor: ['#0b1e3d','#d4af37','#3b82f6','#10b981','#ef4444','#8b5cf6','#f59e0b'] }]
+  }
+});
+</script>
+{% endblock %}

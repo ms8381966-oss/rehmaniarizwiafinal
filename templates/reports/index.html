@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block page_title %}Reports &amp; Export{% endblock %}
+{% block content %}
+
+<div class="card mb-4">
+  <div class="card-header">Export Data (CSV / PDF)</div>
+  <div class="card-body">
+    <p class="text-muted">Choose what to export, an optional date range, and a format. The file downloads immediately or click to view screen data dashboard.</p>
+    
+    <form method="get" action="{% url 'reports:index' %}" class="row g-3 align-items-end" id="filterForm">
+      <div class="col-md-3">
+        <label class="form-label">Report Type</label>
+        <select class="form-select" name="type" id="reportTypeSelect" required>
+          {% for key, label in report_types.items %}
+            <option value="{{ key }}" {% if selected_type == key %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-control" name="start_date" value="{{ start_date|default:'' }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">End Date</label>
+        <input type="date" class="form-control" name="end_date" value="{{ end_date|default:'' }}">
+      </div>
+      <div class="col-md-3" id="formatSelectContainer">
+        <label class="form-label">Format (For Downloading)</label>
+        <select class="form-select" id="exportFormat" name="format">
+          <option value="csv">CSV</option>
+          <option value="pdf">PDF</option>
+        </select>
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-chart-line"></i> View on Screen Dashboard</button>
+        <button class="btn btn-gold" type="button" id="downloadReportBtn"><i class="fa-solid fa-file-export"></i> Download Report</button>
+        <small class="text-muted align-self-center ms-2">Leave dates blank to fetch or export all records.</small>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if selected_type == "students" and report_rows %}
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="fa-solid fa-graduation-cap me-2"></i> Students Performance Ledger Dashboard</h5>
+    <span class="badge bg-secondary" id="recordCounter">{{ report_rows|length }} Records Found</span>
+  </div>
+  
+  <!-- Custom Live Filter Section Added Locally -->
+  <div class="card-body bg-light border-bottom p-3">
+    <div class="row g-2">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+          <input type="text" id="liveSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by Admission #, Name, Section, or Guardian...">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select id="sectionFilterSelect" class="form-select">
+          <option value="">All Sections / Classes</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="button" id="clearFiltersBtn" class="btn btn-outline-secondary w-100"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle mb-0 text-nowrap w-100" id="reportsLedgerTable">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Admission #</th>
+            <th>Name</th>
+            <th>Section</th>
+            <th>Guardian Name</th>
+            <th>Guardian Phone</th>
+            <th class="text-end pe-3">Action Configuration</th>
+          </tr>
+        </thead>
+        <tbody id="tableSearchBody">
+          {% for r in report_rows %}
+          <tr class="student-row" data-section="{{ r.2 }}">
+            <td class="fw-semibold ps-3">{{ r.0 }}</td>
+            <td class="student-name-cell">{{ r.1 }}</td>
+            <td>{{ r.2 }}</td>
+            <td>{{ r.6 }}</td>
+            <td>{{ r.7 }}</td>
+            <td class="text-end pe-3">
+              <button type="button" 
+                      class="btn btn-sm btn-success px-3 rounded-pill action-report-trigger"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#whatsappReportModal"
+                      data-id="{{ r.8.id }}"
+                      data-name="{{ r.1 }}"
+                      data-result="{{ r.8.recent_result_summary }}">
+                <i class="fa-brands fa-whatsapp me-1"></i> Send Report
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div id="noResultsMessage" class="text-center py-4 text-muted d-none">
+        <i class="fa-solid fa-face-frown fs-4 mb-2 d-block"></i> No matching students found.
+      </div>
+    </div>
+  </div>
+</div>
+{% elif selected_type and not report_rows %}
+<div class="alert alert-info border-0 shadow-sm" role="alert">
+  <i class="fa-solid fa-circle-info me-2"></i> Selected filters returned empty rows in active sequence.
+</div>
+{% endif %}
+
+<!-- Reusable WhatsApp Compilation Form Modal Layout Component -->
+<div class="modal fade" id="whatsappReportModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="whatsappReportModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="whatsappReportModalLabel"><i class="fa-brands fa-whatsapp me-2"></i> Compile Parent Performance Report</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label text-muted small text-uppercase fw-bold mb-1">Student Context Name</label>
+          <input type="text" id="modalDisplayStudent" class="form-control-plaintext fw-bold text-dark fs-5 ps-1 pt-0" readonly>
+        </div>
+        <div class="mb-3">
+          <label for="modalInputResult" class="form-label fw-semibold">Result / Marks Summary (Auto Prefilled)</label>
+          <textarea class="form-control border-secondary-subtle" id="modalInputResult" rows="5" placeholder="Enter academic breakdown structure..."></textarea>
+          <div class="form-text text-muted small">Teachers can modify or clear prefilled exams records manually.</div>
+        </div>
+        <div class="mb-3">
+          <label for="modalInputNote" class="form-label fw-semibold">Teacher's Custom Notes / Remarks</label>
+          <textarea class="form-control border-secondary-subtle" id="modalInputNote" rows="2" placeholder="Write behavior or custom academic notes..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer bg-light border-top-0">
+        <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="whatsappFinalActionLinkBtn" target="_blank" class="btn btn-success px-4 fw-semibold shadow-sm d-flex align-items-center">
+          <i class="fa-brands fa-whatsapp me-2 fs-5"></i> Open WhatsApp Web
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    // ---- 1. VANILLA JAVASCRIPT LIVE FILTER ENGINE (100% Independent) ----
+    const searchInput = document.getElementById("liveSearchInput");
+    const sectionFilter = document.getElementById("sectionFilterSelect");
+    const clearBtn = document.getElementById("clearFiltersBtn");
+    const tableRows = document.querySelectorAll(".student-row");
+    const recordCounter = document.getElementById("recordCounter");
+    const noResultsMessage = document.getElementById("noResultsMessage");
+
+    if (tableRows.length > 0) {
+      // Automatic drop-down se section values populate karna
+      const sectionsSet = new Set();
+      tableRows.forEach(row => {
+        const sec = row.getAttribute("data-section");
+        if (sec && sec !== "-") sectionsSet.add(sec);
+      });
+      
+      sectionsSet.forEach(secName => {
+        const opt = document.createElement("option");
+        opt.value = secName;
+        opt.textContent = secName;
+        sectionFilter.appendChild(opt);
+      });
+
+      // Filter execution controller function
+      function filterTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        const selectedSection = sectionFilter.value;
+        let visibleCount = 0;
+
+        tableRows.forEach(row => {
+          const textContent = row.textContent.toLowerCase();
+          const rowSection = row.getAttribute("data-section");
+
+          const matchesSearch = textContent.includes(query);
+          const matchesSection = !selectedSection || rowSection === selectedSection;
+
+          if (matchesSearch && matchesSection) {
+            row.classList.remove("d-none");
+            visibleCount++;
+          } else {
+            row.classList.add("d-none");
+          }
+        });
+
+        // Live Counter update metrics
+        recordCounter.textContent = `${visibleCount} Records Found`;
+        if (visibleCount === 0) {
+          noResultsMessage.classList.remove("d-none");
+        } else {
+          noResultsMessage.classList.add("d-none");
+        }
+      }
+
+      // Event monitors registry
+      searchInput.addEventListener("input", filterTable);
+      sectionFilter.addEventListener("change", filterTable);
+
+      clearBtn.addEventListener("click", function() {
+        searchInput.value = "";
+        sectionFilter.value = "";
+        filterTable();
+      });
+    }
+    // ---- 2. Form Export Routing Separator ----
+    const downloadReportBtn = document.getElementById("downloadReportBtn");
+    const filterForm = document.getElementById("filterForm");
+
+    if(downloadReportBtn && filterForm) {
+      downloadReportBtn.addEventListener("click", function() {
+        const urlParams = new URLSearchParams(new FormData(filterForm)).toString();
+        const exportUrl = "{% url 'reports:export' %}?" + urlParams;
+        window.location.href = exportUrl;
+      });
+    }
+
+    // ---- 3. Live Dynamic API WhatsApp Processing Block ----
+    let activeStudentId = "";
+    const whatsappModalElement = document.getElementById('whatsappReportModal');
+    const fieldDisplayStudent = document.getElementById('modalDisplayStudent');
+    const fieldInputResult = document.getElementById('modalInputResult');
+    const fieldInputNote = document.getElementById('modalInputNote');
+    const actionRedirectAnchorBtn = document.getElementById('whatsappFinalActionLinkBtn');
+
+    if(whatsappModalElement) {
+      whatsappModalElement.addEventListener('show.bs.modal', function (event) {
+        const clickOriginButton = event.relatedTarget;
+        
+        activeStudentId = clickOriginButton.getAttribute('data-id');
+        const studentName = clickOriginButton.getAttribute('data-name');
+        const prefilledResultData = clickOriginButton.getAttribute('data-result');
+
+        fieldDisplayStudent.value = studentName;
+        fieldInputResult.value = prefilledResultData ? prefilledResultData : "";
+        fieldInputNote.value = ""; // Reset remarks layer cleanly
+
+        compileBackendReportLink();
+      });
+
+      // Synchronize input fields real-time monitors
+      fieldInputResult.addEventListener('input', compileBackendReportLink);
+      fieldInputNote.addEventListener('input', compileBackendReportLink);
+    }
+
+    function compileBackendReportLink() {
+      if(!activeStudentId) return;
+
+      const resultTextValue = encodeURIComponent(fieldInputResult.value.trim());
+      const customNoteValue = encodeURIComponent(fieldInputNote.value.trim());
+      
+      const baseApiEndpoint = "{% url 'reports:generate_whatsapp_report' %}";
+      const targetQueryStringUrl = `${baseApiEndpoint}?student_id=${activeStudentId}&result=${resultTextValue}&note=${customNoteValue}`;
+
+      // AJAX Fetch request execution flow
+      fetch(targetQueryStringUrl)
+        .then(response => response.json())
+        .then(data => {
+          if(data.success && data.whatsapp_url) {
+            actionRedirectAnchorBtn.href = data.whatsapp_url;
+            actionRedirectAnchorBtn.classList.remove('disabled');
+          } else {
+            actionRedirectAnchorBtn.href = "#";
+            actionRedirectAnchorBtn.classList.add('disabled');
+          }
+        })
+        .catch(err => {
+          console.error("Error communicating with WhatsApp report view engine: ", err);
+          actionRedirectAnchorBtn.href = "#";
+          actionRedirectAnchorBtn.classList.add('disabled');
+        });
+    }
+  });
+</script>
+{% endblock %}

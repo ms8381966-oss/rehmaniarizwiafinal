@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block page_title %}{% if is_parent_view %}{{ student.full_name }}'s Record{% else %}My Record{% endif %}{% endblock %}
+{% block content %}
+{% if is_parent_view %}<a href="{% url 'portal:home' %}" class="btn btn-sm btn-outline-secondary mb-3"><i class="fa-solid fa-arrow-left"></i> Back to my children</a>{% endif %}
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ student.full_name }}</div>
+      <div class="stat-label">Admission #{{ student.admission_number }} — {{ student.section|default:"Unassigned" }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ attendance_pct }}%</div>
+      <div class="stat-label"><i class="fa-solid fa-clipboard-check me-1"></i>Overall Attendance</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card"><div class="card-body">
+      <div class="stat-value">{{ fees.count }}</div>
+      <div class="stat-label"><i class="fa-solid fa-money-bill-wave me-1"></i>Fee Records</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Attendance History <small class="text-muted">(read-only)</small></div>
+      <div class="card-body" style="max-height:400px; overflow-y:auto;">
+        <table class="table table-sm">
+          <thead><tr><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for r in attendance_records %}
+            <tr><td>{{ r.date }}</td><td><span class="badge bg-secondary">{{ r.get_status_display }}</span></td></tr>
+          {% empty %}<tr><td colspan="2" class="text-center text-muted">No attendance recorded yet.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Fee Status <small class="text-muted">(read-only)</small></div>
+      <div class="card-body" style="max-height:400px; overflow-y:auto;">
+        <table class="table table-sm">
+          <thead><tr><th>Fee</th><th>Due</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for f in fees %}
+            <tr><td>{{ f.fee_structure.name }}</td><td>Rs {{ f.amount_due }}</td><td>Rs {{ f.amount_paid }}</td><td>Rs {{ f.balance }}</td><td><span class="badge bg-secondary">{{ f.get_status_display }}</span></td></tr>
+          {% empty %}<tr><td colspan="5" class="text-center text-muted">No fee records yet.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row g-3 mt-1">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Exam Results <small class="text-muted">(published)</small></div>
+      <div class="card-body">
+        {% for e in result_exams %}
+          <div class="d-flex justify-content-between border-bottom py-2"><span>{{ e.name }} <small class="text-muted">{{ e.start_date }}</small></span>
+            <a class="btn btn-sm btn-navy" target="_blank" href="{% url 'exams:report_card' e.pk student.pk %}"><i class="fa-solid fa-file-lines"></i> View Result Card</a></div>
+        {% empty %}<p class="text-muted mb-0">No published results yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between"><span>Homework</span><a href="{% url 'timetable:view' %}" class="small">Timetable</a></div>
+      <div class="card-body" style="max-height:260px; overflow-y:auto;">
+        {% for h in homework_items %}
+          <div class="border-bottom py-2"><strong>{{ h.title }}</strong>{% if h.subject %} <small class="text-muted">· {{ h.subject.name }}</small>{% endif %}<br><small class="text-muted">Due {{ h.due_date }}</small></div>
+        {% empty %}<p class="text-muted mb-0">No homework assigned.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between"><span>Quran Progress</span><a href="{% url 'hifz:student' student.pk %}" class="small">Full history</a></div>
+      <div class="card-body">
+        <p class="mb-2">{% if hifz.last_sabaq %}Latest Sabaq: <strong>Para {{ hifz.last_sabaq.para }}</strong> ({{ hifz.last_sabaq.date }}){% else %}No Quran progress recorded yet.{% endif %}</p>
+        <table class="table table-sm mb-0"><tbody>
+        {% for r in hifz_records %}<tr><td>{{ r.date }}</td><td>{{ r.get_kind_display }}</td><td>Para {{ r.para }}</td><td>{{ r.portion }}</td><td>{{ r.get_performance_display }}</td></tr>{% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

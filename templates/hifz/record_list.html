@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block page_title %}Quran Progress{% endblock %}
+{% block content %}
+<div class="card">
+    <!-- Clean Card Header without old flex classes -->
+<div class="card-header p-3 bg-transparent">
+  <div class="row g-2 align-items-center">
+    
+    <!-- Left Side: Forms Filter Row -->
+    <div class="col-md-9">
+      <form method="get" class="row g-2 m-0">
+        <div class="col-sm-4">
+          <select name="section" class="form-select form-select-sm">
+            <option value="">All sections</option>
+            {% for s in sections %}
+              <option value="{{ s.pk }}" {% if f_section == s.pk|stringformat:"s" %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <select name="kind" class="form-select form-select-sm">
+            <option value="">All types</option>
+            {% for v, l in kinds %}
+              <option value="{{ v }}" {% if f_kind == v %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <input type="date" name="date" value="{{ f_date }}" class="form-control form-control-sm">
+        </div>
+        <div class="col-sm-1">
+          <button class="btn btn-sm btn-navy w-100" type="submit"><i class="fa-solid fa-search"></i></button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right Side: Clean Button Position aligned right -->
+    <div class="col-md-3 text-end">
+      <a href="{% url 'hifz:add' %}" class="btn btn-gold btn-sm w-100 py-1 fw-semibold">
+        <i class="fa-solid fa-plus me-1"></i> Record Progress
+      </a>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="card-body table-responsive">
+    <table class="table table-hover align-middle">
+      <thead><tr><th>Date</th><th>Student</th><th>Type</th><th>Para</th><th>Portion</th><th>Performance</th><th>Remarks</th><th></th></tr></thead>
+      <tbody>
+      {% for r in records %}
+        <tr><td>{{ r.date }}</td><td><a href="{% url 'hifz:student' r.student.pk %}">{{ r.student.full_name }}</a></td><td>{{ r.get_kind_display }}</td><td>{{ r.para }}</td><td>{{ r.portion }}</td>
+          <td><span class="badge bg-secondary">{{ r.get_performance_display }}</span></td><td>{{ r.remarks }}</td>
+          <td><a href="{% url 'hifz:delete' r.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a></td></tr>
+      {% empty %}<tr><td colspan="8" class="text-center text-muted">No records yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
